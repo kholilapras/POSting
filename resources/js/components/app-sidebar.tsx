@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, List } from 'lucide-react';
+import { BookOpen, Folder, HelpCircle, LayoutGrid, List } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -22,9 +22,9 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Documentation',
+        title: 'Help & Support',
         href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        icon: HelpCircle,
     },
 ];
 
