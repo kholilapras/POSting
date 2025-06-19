@@ -21,10 +21,16 @@ import {
     Row,
 } from '@tanstack/react-table';
 import { useForm } from 'react-hook-form';
+import dayjs from 'dayjs';
+import 'dayjs/locale/id';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Products', href: route('products.index') },
 ];
+
+dayjs.locale('id');
+const formatDate = (dateString: string) =>
+    dayjs(dateString).format('DD MMMM YYYY | HH:mm:ss');
 
 export default function Index({ products, search = '' }: { products: any; search?: string }) {
     const [searchValue, setSearchValue] = useState(search);
@@ -210,8 +216,8 @@ export default function Index({ products, search = '' }: { products: any; search
                                 <p>Name</p><div className="col-span-3">: {detailTarget.product_name}</div>
                                 <p>Price</p><div className="col-span-3">: {detailTarget.product_price}</div>
                                 <p>Stock</p><div className="col-span-3">: {detailTarget.product_stock}</div>
-                                <p>Created at</p><div className="col-span-3">: {detailTarget.created_at}</div>
-                                <p>Updated at</p><div className="col-span-3">: {detailTarget.updated_at}</div>
+                                <p>Created at</p><div className="col-span-3">: {formatDate(detailTarget.created_at)}</div>
+                                <p>Updated at</p><div className="col-span-3">: {formatDate(detailTarget.updated_at)}</div>
                             </div>
                         )}
                         <DialogFooter>
