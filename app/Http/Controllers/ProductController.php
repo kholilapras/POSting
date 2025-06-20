@@ -68,7 +68,7 @@ class ProductController extends Controller
             ->orWhere('product_code', 'like', '%' . $request->q . '%')
             ->get();
 
-        return inertia()->render('cashier/index', [
+        return inertia()->render('cashier', [
             'products' => $products,
         ]);
     }

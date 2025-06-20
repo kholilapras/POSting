@@ -12,7 +12,7 @@ class CashierController extends Controller
         // Misal: kita ingin menampilkan 5 produk terakhir ditambahkan ke database
         $recentProducts = \App\Models\Product::latest()->take(5)->get();
 
-        return Inertia::render('cashier/index', [
+        return Inertia::render('cashier', [
             'recentProducts' => $recentProducts,
         ]);
     }

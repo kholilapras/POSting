@@ -54,6 +54,6 @@ class TransactionController extends Controller
             }
         });
 
-        return redirect()->route('cashier.index')->with('success', 'Transaksi berhasil disimpan.');
+        return redirect()->route('cashier')->with('success', 'Transaksi berhasil disimpan.');
     }
 }

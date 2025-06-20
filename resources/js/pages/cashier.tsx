@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+// File: Cashier.tsx
+import { useState, useRef, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
-import { useHotkeys } from 'react-hotkeys-hook';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,10 +12,12 @@ import type { BreadcrumbItem } from '@/types';
 import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
 import { X, Trash2 } from 'lucide-react';
+import { useCashierHotkeys } from './cashier/hotkeys-navigation';
+import type { RefObject } from 'react';
 
 dayjs.locale('id');
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Cashier', href: route('cashier.index') }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Casddhier', href: route('cashier.index') }];
 
 export default function Cashier({ recentProducts = [] }: { recentProducts?: Product[] }) {
     const { items, add, setQuantity, remove, clear, total } = useCart();
@@ -23,36 +25,21 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
     const change = typeof paid === 'number' ? paid - total : 0;
     const canPay = typeof paid === 'number' && paid >= total && items.length > 0;
 
-    useHotkeys('p', () => {
-        const tag = document.activeElement?.tagName.toLowerCase();
-        if (tag !== 'input' && tag !== 'textarea') {
-            document.getElementById('amount-paid')?.focus();
-        }
-    });
+    const paidInputRef = useRef<HTMLInputElement>(null);
+    const productSearchRef = useRef<HTMLInputElement>(null);
 
-    useHotkeys('space', () => {
-        const tag = document.activeElement?.tagName.toLowerCase();
-        if (tag !== 'input' && tag !== 'textarea') {
-            document.getElementById('product-search')?.focus();
-        }
-    });
-
-    useHotkeys('r', () => {
-        const tag = document.activeElement?.tagName.toLowerCase();
-        if (tag !== 'input' && tag !== 'textarea') {
+    useCashierHotkeys({
+        clearCart: () => {
             clear();
-        }
+            setPaid('');
+        },
+        focusPaidInput: () => paidInputRef.current?.focus(),
+        focusProductSearch: () => productSearchRef.current?.focus(),
+        handlePay: handlePay,
+        canPay,
     });
 
-    useHotkeys('enter', () => {
-        const tag = document.activeElement?.tagName.toLowerCase();
-        if (tag !== 'input' && tag !== 'textarea' && canPay) {
-            handlePay();
-        }
-    });
-
-
-    const handlePay = () => {
+    function handlePay() {
         router.post(
             route('transactions.store'),
             {
@@ -66,20 +53,18 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
                 },
             }
         );
-    };
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Cashier" />
             <div className="p-4 space-y-4">
                 <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Kiri - 75% untuk pencarian dan cart */}
                     <div className="w-full lg:w-3/4 space-y-4">
-                        <ProductSearch onPick={add} />
+                        <ProductSearch onPick={add} inputRef={productSearchRef as RefObject<HTMLInputElement>} />
                         <CartTable items={items} setQty={setQuantity} remove={remove} />
                     </div>
 
-                    {/* Kanan - 25% untuk pembayaran */}
                     <div className="w-full lg:w-1/4 space-y-4 border rounded-xl p-4 shadow-sm">
                         <h2 className="text-lg font-semibold mb-2">Payment</h2>
                         <div className="space-y-2">
@@ -89,6 +74,7 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
                             </div>
                             <Input
                                 id="amount-paid"
+                                ref={paidInputRef}
                                 type="number"
                                 placeholder="Enter amount paid (P)"
                                 value={paid}
@@ -103,17 +89,9 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 pt-4">
-                            <div>
-                                <Button className="w-full" variant="destructive" onClick={() => { clear(); setPaid(''); }}>Reset</Button>
-
-                            </div>
-                            <div className="text-right">
-                                <Button className="w-full" disabled={!canPay} onClick={handlePay}>
-                                    Pay
-                                </Button>
-                            </div>
+                            <Button className="w-full" variant="destructive" onClick={() => { clear(); setPaid(''); }}>Reset</Button>
+                            <Button className="w-full" disabled={!canPay} onClick={handlePay}>Pay</Button>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -121,8 +99,7 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
     );
 }
 
-// Komponen untuk pencarian produk
-function ProductSearch({ onPick }: { onPick: (p: Product) => void }) {
+function ProductSearch({ onPick, inputRef }: { onPick: (p: Product) => void; inputRef: RefObject<HTMLInputElement> }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Product[]>([]);
     const [highlightIndex, setHighlightIndex] = useState<number>(-1);
@@ -169,8 +146,8 @@ function ProductSearch({ onPick }: { onPick: (p: Product) => void }) {
     return (
         <div className="relative w-full">
             <Input
+                ref={inputRef}
                 id="product-search"
-                autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -206,8 +183,6 @@ function ProductSearch({ onPick }: { onPick: (p: Product) => void }) {
     );
 }
 
-
-// Komponen tabel keranjang
 function CartTable({ items, setQty, remove }: {
     items: CartItem[];
     setQty: (id: number, qty: number) => void;
@@ -222,7 +197,7 @@ function CartTable({ items, setQty, remove }: {
                         <th className="px-4 py-2 text-left">Price</th>
                         <th className="px-4 py-2 text-left">Qty</th>
                         <th className="px-4 py-2 text-left">Subtotal</th>
-                        <th className="px-4 py-2 text-left"><Trash2></Trash2></th>
+                        <th className="px-4 py-2 text-left"><Trash2 /></th>
                     </tr>
                 </thead>
                 <tbody className="divide-y">
