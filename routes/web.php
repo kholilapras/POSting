@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CashierController;
+use App\Http\Controllers\TransactionController;
+
+
 
 
 Route::get('/', function () {
@@ -18,6 +22,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 });
+
+// routes/web.php
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+});
+
+// routes/web.php
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+
+
 
 Route::resource('products', ProductController::class);
 

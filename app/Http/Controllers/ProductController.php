@@ -60,4 +60,16 @@ class ProductController extends Controller
         $product->delete();
         return back()->with('success', 'Product deleted.');
     }
+
+    public function search(Request $request)
+    {
+        $products = Product::query()
+            ->where('product_name', 'like', '%' . $request->q . '%')
+            ->orWhere('product_code', 'like', '%' . $request->q . '%')
+            ->get();
+
+        return inertia()->render('cashier/index', [
+            'products' => $products,
+        ]);
+    }
 }

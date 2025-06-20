@@ -14,6 +14,11 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
+        title: 'Cashier',
+        href: '/cashier',
+        icon: List,
+    },
+    {
         title: 'Product',
         href: '/products',
         icon: List,
