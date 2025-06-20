@@ -30,6 +30,28 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
         }
     });
 
+    useHotkeys('space', () => {
+        const tag = document.activeElement?.tagName.toLowerCase();
+        if (tag !== 'input' && tag !== 'textarea') {
+            document.getElementById('product-search')?.focus();
+        }
+    });
+
+    useHotkeys('r', () => {
+        const tag = document.activeElement?.tagName.toLowerCase();
+        if (tag !== 'input' && tag !== 'textarea') {
+            clear();
+        }
+    });
+
+    useHotkeys('enter', () => {
+        const tag = document.activeElement?.tagName.toLowerCase();
+        if (tag !== 'input' && tag !== 'textarea' && canPay) {
+            handlePay();
+        }
+    });
+
+
     const handlePay = () => {
         router.post(
             route('transactions.store'),
@@ -82,9 +104,8 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
 
                         <div className="grid grid-cols-2 gap-2 pt-4">
                             <div>
-                                <Button className="w-full" variant="destructive" onClick={clear}>
-                                    Reset
-                                </Button>
+                                <Button className="w-full" variant="destructive" onClick={() => { clear(); setPaid(''); }}>Reset</Button>
+
                             </div>
                             <div className="text-right">
                                 <Button className="w-full" disabled={!canPay} onClick={handlePay}>
@@ -104,6 +125,7 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
 function ProductSearch({ onPick }: { onPick: (p: Product) => void }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Product[]>([]);
+    const [highlightIndex, setHighlightIndex] = useState<number>(-1);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -114,7 +136,10 @@ function ProductSearch({ onPick }: { onPick: (p: Product) => void }) {
                 {
                     preserveState: true,
                     only: ['products'],
-                    onSuccess: ({ props }: any) => setResults(props.products ?? []),
+                    onSuccess: ({ props }: any) => {
+                        setResults(props.products ?? []);
+                        setHighlightIndex(-1);
+                    },
                 }
             );
         }, 300);
@@ -122,26 +147,50 @@ function ProductSearch({ onPick }: { onPick: (p: Product) => void }) {
         return () => clearTimeout(timeout);
     }, [query]);
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (results.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setHighlightIndex((prev) => (prev + 1) % results.length);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setHighlightIndex((prev) => (prev - 1 + results.length) % results.length);
+        } else if (e.key === 'Enter') {
+            if (highlightIndex >= 0 && highlightIndex < results.length) {
+                onPick(results[highlightIndex]);
+                setQuery('');
+                setResults([]);
+                setHighlightIndex(-1);
+            }
+        }
+    };
+
     return (
         <div className="relative w-full">
             <Input
+                id="product-search"
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Scan or type product name/code…"
+                onKeyDown={handleKeyDown}
+                placeholder="Scan or type product name/code (Space Button)"
                 className="rounded-xl shadow-sm w-full"
             />
 
             {results.length > 0 && (
                 <div className="absolute mt-1 bg-white dark:bg-background w-full max-h-60 overflow-auto rounded-xl shadow-md z-50 border">
-                    {results.map((p) => (
+                    {results.map((p, idx) => (
                         <div
                             key={p.id}
-                            className="px-4 py-2 hover:bg-muted cursor-pointer flex justify-between"
+                            className={`px-4 py-2 flex justify-between cursor-pointer ${idx === highlightIndex ? 'bg-muted' : 'hover:bg-muted'
+                                }`}
+                            onMouseEnter={() => setHighlightIndex(idx)}
                             onClick={() => {
                                 onPick(p);
                                 setQuery('');
                                 setResults([]);
+                                setHighlightIndex(-1);
                             }}
                         >
                             <div className="flex flex-col">
@@ -156,6 +205,7 @@ function ProductSearch({ onPick }: { onPick: (p: Product) => void }) {
         </div>
     );
 }
+
 
 // Komponen tabel keranjang
 function CartTable({ items, setQty, remove }: {
