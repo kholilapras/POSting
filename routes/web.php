@@ -7,9 +7,6 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\TransactionController;
 
-
-
-
 Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('dashboard');
@@ -18,24 +15,21 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-});
 
-// routes/web.php
-Route::middleware(['auth', 'verified'])->group(function () {
-    //Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
+    // Cashier
     Route::resource('cashier', CashierController::class);
+
+    // Produk
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+    Route::resource('products', ProductController::class);
+
+    // Transaksi
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 });
-
-// routes/web.php
-Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');    
-
-
-Route::resource('products', ProductController::class);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
