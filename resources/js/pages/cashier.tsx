@@ -1,4 +1,3 @@
-// File: Cashier.tsx
 import { useState, useRef, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import dayjs from 'dayjs';
@@ -220,7 +219,7 @@ function CartTable({ items, setQty, remove }: {
                                     onClick={() => remove(it.id)}
                                     className="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-700"
                                 >
-                                    <X/>
+                                    <X />
                                 </button>
                             </td>
                         </tr>
