@@ -72,4 +72,66 @@ class ProductController extends Controller
             'products' => $products,
         ]);
     }
+
+
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file')->getRealPath();
+        $handle = fopen($file, 'r');
+        $header = fgetcsv($handle); // Baris header pertama
+
+        if (!$header || count($header) < 4) {
+            return back()->withErrors(['file' => 'Format CSV tidak sesuai. Minimal harus punya 4 kolom.']);
+        }
+
+        $imported = 0;
+        $skipped = 0;
+        $duplicates = [];
+
+        while (($row = fgetcsv($handle)) !== false) {
+            $code  = trim($row[0] ?? '');
+            $name  = trim($row[1] ?? '');
+            $price = (float)($row[2] ?? 0);
+            $stock = (int)($row[3] ?? 0);
+
+            if (!$code || !$name || $price < 0 || $stock < 0) {
+                $skipped++;
+                continue;
+            }
+
+            $exists = Product::where('product_code', $code)->first();
+
+            if ($exists) {
+                $skipped++;
+                $duplicates[] = $code;
+                continue;
+            }
+
+            Product::create([
+                'product_code' => $code,
+                'product_name' => $name,
+                'product_price' => $price,
+                'product_stock' => $stock,
+            ]);
+
+            $imported++;
+        }
+
+        fclose($handle);
+
+        $message = "{$imported} produk berhasil diimpor.";
+        if ($skipped > 0) {
+            $message .= " {$skipped} dilewati (duplikat / data tidak valid).";
+        }
+
+        if (!empty($duplicates)) {
+            $message .= " Duplikat: " . implode(', ', $duplicates);
+        }
+
+        return redirect()->route('products.index')->with('success', $message);
+    }
 }

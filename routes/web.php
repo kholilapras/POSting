@@ -29,6 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Transaksi
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+
+    Route::post('/products/import-csv', [ProductController::class, 'importCsv'])->name('products.import.csv');
 });
 
 require __DIR__ . '/settings.php';

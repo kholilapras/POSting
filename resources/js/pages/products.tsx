@@ -148,6 +148,35 @@ export default function Index({ products, search = '' }: { products: any; search
                             <ProductForm onSubmit={isEditing ? handleUpdate : handleCreate} defaultValues={editing || {}} isEditing={isEditing} />
                         </DialogContent>
                     </Dialog>
+
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">📁 Import CSV</Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Import Products from CSV</DialogTitle>
+                            </DialogHeader>
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const formData = new FormData(e.currentTarget);
+                                    router.post(route('products.import.csv'), formData, {
+                                        forceFormData: true,
+                                        onSuccess: () => alert('Import berhasil!'),
+                                        onError: (errors) => alert(`Gagal import: ${errors.file ?? 'Periksa format file'}`),
+                                    });
+                                }}
+                                encType="multipart/form-data"
+                            >
+                                <Input name="file" type="file" accept=".csv" required />
+                                <DialogFooter className="pt-4">
+                                    <Button type="submit">Upload</Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+
                 </div>
 
                 {/*product table*/}
