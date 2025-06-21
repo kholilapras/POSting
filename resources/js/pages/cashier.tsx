@@ -10,7 +10,7 @@ import { formatIDR } from '@/lib/currency';
 import type { BreadcrumbItem } from '@/types';
 import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
-import { X, Trash2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useCashierHotkeys } from './cashier/hotkeys-navigation';
 import type { RefObject } from 'react';
 
@@ -196,7 +196,7 @@ function CartTable({ items, setQty, remove }: {
                         <th className="px-4 py-2 text-left">Price</th>
                         <th className="px-4 py-2 text-left">Qty</th>
                         <th className="px-4 py-2 text-left">Subtotal</th>
-                        <th className="px-4 py-2 text-left"><Trash2 /></th>
+                        <th className="px-4 py-2 text-left"></th>
                     </tr>
                 </thead>
                 <tbody className="divide-y">
