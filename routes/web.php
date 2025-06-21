@@ -25,14 +25,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // routes/web.php
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
+    //Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
+    Route::resource('cashier', CashierController::class);
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 });
 
 // routes/web.php
-Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
-
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');    
 
 
 Route::resource('products', ProductController::class);

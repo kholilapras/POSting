@@ -17,7 +17,7 @@ import type { RefObject } from 'react';
 
 dayjs.locale('id');
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Casddhier', href: route('cashier.index') }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Cashier', href: route('cashier.index') }];
 
 export default function Cashier({ recentProducts = [] }: { recentProducts?: Product[] }) {
     const { items, add, setQuantity, remove, clear, total } = useCart();

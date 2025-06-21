@@ -10,11 +10,9 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('transaction_details', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    { {
+            Schema::rename('transactions_details', 'transaction_details');
+        }
     }
 
     /**
@@ -22,6 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaction_details');
+        Schema::rename('transaction_details', 'transactions_details');
     }
 };
