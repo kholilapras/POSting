@@ -66,7 +66,7 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
                     </div>
 
                     <div className="w-full lg:w-1/4 space-y-4 border rounded-xl p-4 shadow-sm">
-                        <h2 className="text-lg font-semibold mb-2">Payment</h2>
+                        <h2 className="text-lg font-semibold">Payment</h2>
                         <div className="space-y-2">
                             <div className="flex justify-between">
                                 <span>Total:</span>
@@ -82,7 +82,7 @@ export default function Cashier({ recentProducts = [] }: { recentProducts?: Prod
                             />
                             {change >= 0 && (
                                 <div className="flex justify-between">
-                                    <span>Change:</span>
+                                    <span>Change :</span>
                                     <span className="font-semibold">{formatIDR(change)}</span>
                                 </div>
                             )}
@@ -218,9 +218,9 @@ function CartTable({ items, setQty, remove }: {
                             <td className="px-4 py-2">
                                 <button
                                     onClick={() => remove(it.id)}
-                                    className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900"
+                                    className="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-700"
                                 >
-                                    <X size={16} className="text-red-500" />
+                                    <X/>
                                 </button>
                             </td>
                         </tr>
