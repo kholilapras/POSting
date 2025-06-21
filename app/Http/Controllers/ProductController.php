@@ -21,7 +21,7 @@ class ProductController extends Controller
             });
         }
 
-        $products = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+        $products = $query->orderBy('updated_at', 'desc')->paginate(10)->withQueryString();
 
         return inertia('products', [
             'products' => $products,
